@@ -1,0 +1,13 @@
+build/
+build_*/
+*.o
+*.obj
+*.exe
+*.out
+.vscode/
+.idea/
+.codegraph/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
