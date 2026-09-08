@@ -19,3 +19,22 @@ export interface WinningLine {
   length: number
   player: Player
 }
+
+export type PlayerSeat = 'A' | 'B'
+export type Parity = 'Odd' | 'Even'
+export type OpeningPhase = 'ColorSelect' | 'GuessFirst' | 'Completed'
+export type ColorSelectState = 'Pending' | 'Confirmed' | 'Assigned'
+export type GuessFirstState = 'WaitingRoll' | 'Rolled' | 'Guessed' | 'Judged'
+export type ColorAssignResult = 'ABlackBWhite' | 'AWhiteBBlack'
+export type SeatAssignResult = 'AOneBTwo' | 'ATwoBOne'
+
+export interface OpeningAssignment {
+  colorAssign: ColorAssignResult
+  seatAssign: SeatAssignResult
+}
+
+export type BgmSwitch = 'On' | 'Off'
+export type SfxSwitch = 'On' | 'Off'
+export type AudioUnlockState = 'Locked' | 'Unlocked'
+export type BgmPlayState = 'Playing' | 'Paused'
+export type SfxType = 'Place' | 'Win' | 'Draw'

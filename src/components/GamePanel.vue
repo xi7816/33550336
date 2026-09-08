@@ -1,32 +1,98 @@
 <script setup lang="ts">
 import { useGame } from '@/composables/useGame'
+import { useOpening } from '@/composables/useOpening'
+import { useAudio } from '@/composables/useAudio'
 import TurnIndicator from './TurnIndicator.vue'
 import ControlBar from './ControlBar.vue'
 import GomokuBoard from './GomokuBoard.vue'
+import ColorSelectDialog from './ColorSelectDialog.vue'
+import GuessFirstDialog from './GuessFirstDialog.vue'
+import MusicPanel from './MusicPanel.vue'
 
-const { snapshot, initGame, placeStone, undo, restart } = useGame()
+const audio = useAudio()
+const game = useGame(audio)
+const opening = useOpening()
+
+const { snapshot, initGame, placeStone, undo, restart } = game
+const {
+  snapshot: openingSnapshot,
+  confirm,
+  selectSize,
+  rollNumber,
+  guess,
+  reset
+} = opening
+const {
+  snapshot: audioSnapshot,
+  unlock,
+  toggleBgm,
+  setVolume,
+  toggleSfx
+} = audio
+
+opening.onCompleted((size, firstPlayer) => {
+  initGame(size, firstPlayer)
+})
+
+function handleInit(size: number): void {
+  const firstPlayer = openingSnapshot.value.firstPlayer
+  if (firstPlayer) {
+    initGame(size, firstPlayer)
+  }
+}
+
+function handleRestart(): void {
+  restart()
+  reset()
+}
 </script>
 
 <template>
-  <div class="game-panel">
-    <TurnIndicator
-      :current-player="snapshot.currentPlayer"
-      :game-state="snapshot.gameState"
+  <div
+    class="game-panel"
+    @pointerdown.once="unlock"
+  >
+    <MusicPanel
+      :snapshot="audioSnapshot"
+      @toggle-bgm="toggleBgm"
+      @set-volume="setVolume"
+      @toggle-sfx="toggleSfx"
     />
-    <GomokuBoard
-      :board="snapshot.board"
-      :winning-line="snapshot.winningLine"
-      :disabled="snapshot.gameState !== 'InProgress'"
-      @place="placeStone"
+
+    <ColorSelectDialog
+      :visible="openingSnapshot.phase === 'ColorSelect'"
+      :snapshot="openingSnapshot"
+      @confirm="confirm"
+      @select-size="selectSize"
     />
-    <ControlBar
-      :game-state="snapshot.gameState"
-      :history-length="snapshot.history.length"
-      :current-size="snapshot.boardSize"
-      @init="initGame"
-      @undo="undo"
-      @restart="restart"
+
+    <GuessFirstDialog
+      :visible="openingSnapshot.phase === 'GuessFirst'"
+      :snapshot="openingSnapshot"
+      @roll-number="rollNumber"
+      @guess="guess"
     />
+
+    <template v-if="openingSnapshot.phase === 'Completed'">
+      <TurnIndicator
+        :current-player="snapshot.currentPlayer"
+        :game-state="snapshot.gameState"
+      />
+      <GomokuBoard
+        :board="snapshot.board"
+        :winning-line="snapshot.winningLine"
+        :disabled="snapshot.gameState !== 'InProgress'"
+        @place="placeStone"
+      />
+      <ControlBar
+        :game-state="snapshot.gameState"
+        :history-length="snapshot.history.length"
+        :current-size="snapshot.boardSize"
+        @init="handleInit"
+        @undo="undo"
+        @restart="handleRestart"
+      />
+    </template>
   </div>
 </template>
 

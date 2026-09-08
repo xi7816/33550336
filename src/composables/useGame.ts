@@ -3,6 +3,7 @@ import { Board } from '@/domain/Board'
 import { checkWin, checkDraw } from '@/domain/Judge'
 import type { GameState, Player, Position, WinningLine, MoveRecord } from '@/domain/types'
 import { showError, showResult } from '@/utils/message'
+import type { UseAudio } from '@/composables/useAudio'
 
 export interface GameSnapshot {
   board: Board | null
@@ -15,7 +16,7 @@ export interface GameSnapshot {
 
 export interface UseGame {
   snapshot: ShallowRef<GameSnapshot>
-  initGame: (size: number) => void
+  initGame: (size: number, firstPlayer: Player) => void
   placeStone: (pos: Position) => void
   undo: () => void
   restart: () => void
@@ -43,24 +44,25 @@ const DIR_NAMES: Record<string, string> = {
   RightDiagonal: '右斜'
 }
 
-export function useGame(): UseGame {
+export function useGame(audio: UseAudio): UseGame {
   const snapshot = shallowRef<GameSnapshot>(createInitialSnapshot())
 
   function update(partial: Partial<GameSnapshot>): void {
     snapshot.value = { ...snapshot.value, ...partial }
   }
 
-  function initGame(size: number): void {
+  function initGame(size: number, firstPlayer: Player): void {
     try {
       const board = new Board(size)
       update({
         board,
-        currentPlayer: 'Black',
+        currentPlayer: firstPlayer,
         gameState: 'InProgress',
         history: [],
         winningLine: null,
         boardSize: size
       })
+      audio.onGameStart()
     } catch {
       showError('棋盘尺寸须为 5 至 19 之间的奇数')
     }
@@ -87,6 +89,8 @@ export function useGame(): UseGame {
     if (win) {
       const state: GameState = s.currentPlayer === 'Black' ? 'BlackWin' : 'WhiteWin'
       update({ board: newBoard, history, gameState: state, winningLine: win })
+      audio.onGameEnd()
+      audio.playSfx('Win')
       const winner = s.currentPlayer === 'Black' ? '黑方' : '白方'
       showResult(
         `${winner}获胜！`,
@@ -97,11 +101,14 @@ export function useGame(): UseGame {
 
     if (checkDraw(s.board)) {
       update({ board: newBoard, history, gameState: 'Draw' })
+      audio.onGameEnd()
+      audio.playSfx('Draw')
       showResult('平局', '棋盘已满，双方未形成五子连珠')
       return
     }
 
     update({ board: newBoard, history, currentPlayer: opponent(s.currentPlayer) })
+    audio.playSfx('Place')
   }
 
   function undo(): void {
@@ -123,6 +130,7 @@ export function useGame(): UseGame {
   }
 
   function restart(): void {
+    audio.onGameReset()
     update(createInitialSnapshot())
   }
 
