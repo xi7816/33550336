@@ -2,6 +2,7 @@
 import { useGame } from '@/composables/useGame'
 import { useOpening } from '@/composables/useOpening'
 import { useAudio } from '@/composables/useAudio'
+import { useSwitchSong } from '@/composables/useSwitchSong'
 import TurnIndicator from './TurnIndicator.vue'
 import ControlBar from './ControlBar.vue'
 import GomokuBoard from './GomokuBoard.vue'
@@ -12,6 +13,7 @@ import MusicPanel from './MusicPanel.vue'
 const audio = useAudio()
 const game = useGame(audio)
 const opening = useOpening()
+const switchSong = useSwitchSong(audio)
 
 const { snapshot, initGame, placeStone, undo, restart } = game
 const {
@@ -54,9 +56,11 @@ function handleRestart(): void {
   >
     <MusicPanel
       :snapshot="audioSnapshot"
+      :switch-song-snapshot="switchSong.snapshot.value"
       @toggle-bgm="toggleBgm"
       @set-volume="setVolume"
       @toggle-sfx="toggleSfx"
+      @switch-song-click="switchSong.handleClick"
     />
 
     <ColorSelectDialog

@@ -36,6 +36,8 @@ export interface UseAudio {
   onGameEnd: () => void
   onGameReset: () => void
   playSfx: (type: SfxType) => void
+  pauseBgmPlayback: () => void
+  switchToNextTrack: () => void
 }
 
 function createInitialSnapshot(): AudioSnapshot {
@@ -240,6 +242,19 @@ export function useAudio(): UseAudio {
     el.play().catch(() => {})
   }
 
+  function pauseBgmPlayback(): void {
+    bgmEl.pause()
+    update({ bgmPlayState: 'Paused' })
+  }
+
+  function switchToNextTrack(): void {
+    if (!snapshot.value.bgmAvailable) {
+      console.warn('[switchToNextTrack] 无可用背景音乐曲目')
+      return
+    }
+    advanceToNext()
+  }
+
   loadTrackList()
 
   return {
@@ -251,6 +266,8 @@ export function useAudio(): UseAudio {
     onGameStart,
     onGameEnd,
     onGameReset,
-    playSfx
+    playSfx,
+    pauseBgmPlayback,
+    switchToNextTrack
   }
 }

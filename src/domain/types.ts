@@ -38,3 +38,11 @@ export type SfxSwitch = 'On' | 'Off'
 export type AudioUnlockState = 'Locked' | 'Unlocked'
 export type BgmPlayState = 'Playing' | 'Paused'
 export type SfxType = 'Place' | 'Win' | 'Draw'
+
+export type SwitchSongState = 'Idle' | 'Transitioning'
+export type SwitchSongResult = 'Success' | 'TransitionUnavailable' | 'HandoffFailed'
+
+export interface SwitchSongSnapshot {
+  state: SwitchSongState
+  lastResult: SwitchSongResult
+}

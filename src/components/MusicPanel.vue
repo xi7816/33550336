@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import type { AudioSnapshot } from '@/composables/useAudio'
+import type { SwitchSongSnapshot } from '@/domain/types'
+import SwitchSongButton from './SwitchSongButton.vue'
 
 const props = defineProps<{
   snapshot: AudioSnapshot
+  switchSongSnapshot: SwitchSongSnapshot
 }>()
 
 const emit = defineEmits<{
   toggleBgm: []
   setVolume: [value: number]
   toggleSfx: []
+  switchSongClick: []
 }>()
 
 function isBgmOn(): boolean {
@@ -59,6 +63,11 @@ function handleVolumeChange(val: number | number[]): void {
         @change="handleVolumeChange"
       />
     </div>
+
+    <SwitchSongButton
+      :snapshot="switchSongSnapshot"
+      @click="emit('switchSongClick')"
+    />
 
     <p v-if="snapshot.unlockState === 'Locked'" class="unlock-hint">
       点击页面任意位置开启声音
