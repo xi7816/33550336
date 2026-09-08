@@ -8,10 +8,17 @@ export interface TransitionPlayer {
   dispose: () => void
   getDuration: () => number
   setVolume: (volume: number) => void
+  attach: (container: HTMLElement) => void
+  detach: () => void
 }
 
 export function createTransitionPlayer(): TransitionPlayer {
-  const audio = new Audio()
+  const video = document.createElement('video')
+  video.controls = false
+  video.loop = false
+  video.style.width = '100%'
+  video.style.height = '100%'
+  video.style.objectFit = 'contain'
 
   let endedHandler: (() => void) | null = null
   let errorHandler: (() => void) | null = null
@@ -20,7 +27,7 @@ export function createTransitionPlayer(): TransitionPlayer {
     if (endedHandler) {
       const h = endedHandler
       endedHandler = null
-      audio.removeEventListener('ended', internalEnded)
+      video.removeEventListener('ended', internalEnded)
       h()
     }
   }
@@ -29,34 +36,46 @@ export function createTransitionPlayer(): TransitionPlayer {
     if (errorHandler) {
       const h = errorHandler
       errorHandler = null
-      audio.removeEventListener('error', internalError)
+      video.removeEventListener('error', internalError)
       h()
     }
   }
 
   function play(url: string, volume: number): void {
-    audio.src = url
-    audio.volume = Math.max(0, Math.min(1, volume / 100))
-    audio.play().catch(() => {})
+    video.src = url
+    video.volume = Math.max(0, Math.min(1, volume / 100))
+    video.play().catch(() => {})
   }
 
   function onEnded(handler: () => void): void {
     endedHandler = handler
-    audio.addEventListener('ended', internalEnded)
+    video.addEventListener('ended', internalEnded)
   }
 
   function onError(handler: () => void): void {
     errorHandler = handler
-    audio.addEventListener('error', internalError)
+    video.addEventListener('error', internalError)
+  }
+
+  function attach(container: HTMLElement): void {
+    detach()
+    container.appendChild(video)
+  }
+
+  function detach(): void {
+    if (video.parentNode) {
+      video.parentNode.removeChild(video)
+    }
   }
 
   function stop(): void {
-    audio.pause()
-    audio.src = ''
-    audio.removeEventListener('ended', internalEnded)
-    audio.removeEventListener('error', internalError)
+    video.pause()
+    video.src = ''
+    video.removeEventListener('ended', internalEnded)
+    video.removeEventListener('error', internalError)
     endedHandler = null
     errorHandler = null
+    detach()
   }
 
   function dispose(): void {
@@ -64,11 +83,11 @@ export function createTransitionPlayer(): TransitionPlayer {
   }
 
   function getDuration(): number {
-    return audio.duration
+    return video.duration
   }
 
   function setVolume(volume: number): void {
-    audio.volume = Math.max(0, Math.min(1, volume / 100))
+    video.volume = Math.max(0, Math.min(1, volume / 100))
   }
 
   return {
@@ -78,6 +97,8 @@ export function createTransitionPlayer(): TransitionPlayer {
     stop,
     dispose,
     getDuration,
-    setVolume
+    setVolume,
+    attach,
+    detach
   }
 }

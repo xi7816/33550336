@@ -9,6 +9,7 @@ import GomokuBoard from './GomokuBoard.vue'
 import ColorSelectDialog from './ColorSelectDialog.vue'
 import GuessFirstDialog from './GuessFirstDialog.vue'
 import MusicPanel from './MusicPanel.vue'
+import TransitionVideoOverlay from './TransitionVideoOverlay.vue'
 
 const audio = useAudio()
 const game = useGame(audio)
@@ -61,6 +62,13 @@ function handleRestart(): void {
       @set-volume="setVolume"
       @toggle-sfx="toggleSfx"
       @switch-song-click="switchSong.handleClick"
+    />
+
+    <TransitionVideoOverlay
+      :visible="switchSong.overlayVisible.value"
+      :skip-button-visible="switchSong.skipButtonVisible.value"
+      @container-ready="switchSong.handleContainerReady"
+      @skip="switchSong.handleSkip"
     />
 
     <ColorSelectDialog
