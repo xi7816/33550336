@@ -1,0 +1,21 @@
+build/
+build_*/
+*.o
+*.obj
+*.exe
+*.out
+.vscode/
+.idea/
+.codegraph/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+node_modules/
+dist/
+# kgm格式浏览器无法播放，不上传
+public/bgm/*.kgm
+# 日志和临时文件
+*.log
+start-vite.cmd
+vite-*.log
