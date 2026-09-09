@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 char Renderer::stoneToChar(CellState cell) {
     switch (cell) {
@@ -41,22 +42,34 @@ void Renderer::renderWelcome() {
     std::cout << "------------------------------\n";
 }
 
-void Renderer::renderBoard(const Board& board) {
+std::vector<std::string> Renderer::buildBoardLines(const Board& board) {
     int n = board.size();
     int width = (n >= 10) ? 3 : 2;
+    std::vector<std::string> lines;
+    lines.reserve(n + 1);
 
-    std::cout << std::string(width, ' ');
+    std::ostringstream header;
+    header << std::string(width, ' ');
     for (int c = 1; c <= n; ++c) {
-        std::cout << std::setw(width) << c;
+        header << std::setw(width) << c;
     }
-    std::cout << '\n';
+    lines.push_back(header.str());
 
     for (int r = 1; r <= n; ++r) {
-        std::cout << std::setw(width) << r;
+        std::ostringstream row;
+        row << std::setw(width) << r;
         for (int c = 1; c <= n; ++c) {
-            std::cout << std::setw(width) << stoneToChar(board.getCell({r, c}));
+            row << std::setw(width) << stoneToChar(board.getCell({r, c}));
         }
-        std::cout << '\n';
+        lines.push_back(row.str());
+    }
+    return lines;
+}
+
+void Renderer::renderBoard(const Board& board) {
+    auto lines = buildBoardLines(board);
+    for (const auto& line : lines) {
+        std::cout << line << '\n';
     }
 }
 

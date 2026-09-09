@@ -8,6 +8,7 @@
 #include "Judge.h"
 #include "Log.h"
 #include "BgmPlayer.h"
+#include "GameView.h"
 
 GameController::GameController()
     : board_(15), currentPlayer_(Player::Black), state_(GameState::InProgress) {}
@@ -56,7 +57,7 @@ void GameController::initGame() {
     winningLine_.reset();
 
     LOG("初始化棋盘 " + std::to_string(size) + "x" + std::to_string(size) + "，黑方先手");
-    Renderer::renderBoard(board_);
+    GameView::renderComposite(board_, currentPlayer_, state_);
     bgmPlayer_.start();
 }
 
@@ -72,7 +73,6 @@ void GameController::processMove(Position pos) {
 
     board_.placeStone(pos, currentPlayer_);
     history_.push_back(MoveRecord{pos, currentPlayer_});
-    Renderer::renderBoard(board_);
 
     LOG("落子 (" + std::to_string(pos.row) + "," + std::to_string(pos.col) + ") by " +
         (currentPlayer_ == Player::Black ? "Black" : "White"));
@@ -82,14 +82,17 @@ void GameController::processMove(Position pos) {
         winningLine_ = win;
         state_ = (currentPlayer_ == Player::Black) ? GameState::BlackWin : GameState::WhiteWin;
         LOG("胜负判定：获胜");
+        GameView::renderComposite(board_, currentPlayer_, state_);
         return;
     }
     if (Judge::checkDraw(board_)) {
         state_ = GameState::Draw;
         LOG("胜负判定：平局");
+        GameView::renderComposite(board_, currentPlayer_, state_);
         return;
     }
     currentPlayer_ = opponent(currentPlayer_);
+    GameView::renderComposite(board_, currentPlayer_, state_);
 }
 
 void GameController::processUndo() {
@@ -106,7 +109,7 @@ void GameController::processUndo() {
     history_.pop_back();
     board_.clearStone(last.pos);
     currentPlayer_ = last.player;
-    Renderer::renderBoard(board_);
+    GameView::renderComposite(board_, currentPlayer_, state_);
 
     LOG("悔棋至 (" + std::to_string(last.pos.row) + "," + std::to_string(last.pos.col) + ")，回合恢复为 " +
         (last.player == Player::Black ? "Black" : "White"));

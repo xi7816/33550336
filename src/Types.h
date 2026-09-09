@@ -41,3 +41,18 @@ struct WinningLine {
     int length;
     Player player;
 };
+
+enum class PotActivity {
+    Active,
+    Idle
+};
+
+enum class LayoutOrientation {
+    LeftRight,
+    TopBottom
+};
+
+struct PotSize {
+    int height;
+    int width;
+};

@@ -6,6 +6,7 @@ import { useSwitchSong } from '@/composables/useSwitchSong'
 import TurnIndicator from './TurnIndicator.vue'
 import ControlBar from './ControlBar.vue'
 import GomokuBoard from './GomokuBoard.vue'
+import JarIndicator from './JarIndicator.vue'
 import ColorSelectDialog from './ColorSelectDialog.vue'
 import GuessFirstDialog from './GuessFirstDialog.vue'
 import MusicPanel from './MusicPanel.vue'
@@ -90,12 +91,18 @@ function handleRestart(): void {
         :current-player="snapshot.currentPlayer"
         :game-state="snapshot.gameState"
       />
-      <GomokuBoard
-        :board="snapshot.board"
-        :winning-line="snapshot.winningLine"
-        :disabled="snapshot.gameState !== 'InProgress'"
-        @place="placeStone"
-      />
+      <JarIndicator
+        :current-player="snapshot.currentPlayer"
+        :game-state="snapshot.gameState"
+        :visible="openingSnapshot.phase === 'Completed'"
+      >
+        <GomokuBoard
+          :board="snapshot.board"
+          :winning-line="snapshot.winningLine"
+          :disabled="snapshot.gameState !== 'InProgress'"
+          @place="placeStone"
+        />
+      </JarIndicator>
       <ControlBar
         :game-state="snapshot.gameState"
         :history-length="snapshot.history.length"

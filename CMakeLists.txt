@@ -29,6 +29,11 @@ add_executable(gomoku
     src/InputReader.cpp
     src/GameController.cpp
     src/BgmPlayer.cpp
+    src/PotStyle.h
+    src/PotActivityResolver.cpp
+    src/PotRenderer.cpp
+    src/LayoutComposer.cpp
+    src/GameView.cpp
 )
 
 target_include_directories(gomoku PRIVATE src)
@@ -51,6 +56,10 @@ set(TEST_SOURCES
     test/TestVolumeController.cpp
     test/TestPlaylistManager.cpp
     test/TestBgmPlayer.cpp
+    test/TestPotActivityResolver.cpp
+    test/TestPotRenderer.cpp
+    test/TestLayoutComposer.cpp
+    test/TestGameView.cpp
 )
 
 add_executable(gomoku_test
@@ -60,6 +69,10 @@ add_executable(gomoku_test
     src/Renderer.cpp
     src/InputReader.cpp
     src/BgmPlayer.cpp
+    src/PotActivityResolver.cpp
+    src/PotRenderer.cpp
+    src/LayoutComposer.cpp
+    src/GameView.cpp
 )
 
 target_include_directories(gomoku_test PRIVATE src test)

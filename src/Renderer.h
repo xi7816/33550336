@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <optional>
 #include "Types.h"
 #include "Board.h"
@@ -9,6 +10,7 @@ class Renderer {
 public:
     static void renderWelcome();
     static void renderBoard(const Board& board);
+    static std::vector<std::string> buildBoardLines(const Board& board);
     static void renderPrompt(Player current);
     static void renderResult(GameState state, const std::optional<WinningLine>& line);
     static void renderError(const std::string& msg);
